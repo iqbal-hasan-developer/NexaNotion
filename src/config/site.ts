@@ -1,0 +1,30 @@
+export const siteConfig = {
+  name: "NexaNotion",
+  tagline: "Style, Beauty & Gifts - All in One Notion.",
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") ?? "",
+  whatsappDisplay: "01828928660",
+  whatsappHref: "https://wa.me/8801828928660",
+  email: "nexanotion@gmail.com",
+  website: "www.nexanotion.com",
+  websiteHref: "https://www.nexanotion.com",
+  location: "Bangladesh",
+  serviceArea: "Bangladesh",
+  facebookHref: "https://www.facebook.com/profile.php?id=61577832233334",
+  instagramHref: "https://www.instagram.com/nexa.notion?igsh=MXg5Zzk1bHltYzJwdg==&utm_source=ig_contact_invite",
+  tiktokHref: "https://vt.tiktok.com/ZSCNhjpef/",
+  deliveryCharge: 80,
+  deliveryAreas: ["Inside Dhaka", "Outside Dhaka", "Other / Confirm by phone"],
+  manualPayments: {
+    bkash: {
+      label: "bKash",
+      number: "01683158940",
+      instruction: "Send Money to this bKash number and enter your Transaction ID below.",
+    },
+    nagad: {
+      label: "Nagad",
+      number: "01683158940",
+      instruction: "Send Money to this Nagad number and enter your Transaction ID below.",
+    },
+  },
+  supportHours: "Every day, 10 AM - 9 PM",
+} as const;
