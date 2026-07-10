@@ -66,7 +66,7 @@ export default async function GiftPackagesPage() {
         <Container>
           <div className="motion-card grid overflow-hidden rounded-[2rem] bg-brand-navy text-white lg:grid-cols-2">
             <div className="motion-image-group relative min-h-[320px]">
-              <Image src="/images/gift-package.jpg" alt="Custom NexaNotion gift package" fill sizes="(max-width: 1024px) 100vw, 50vw" className="motion-image object-cover" />
+              <Image src={bannerImage} alt="Custom NexaNotion gift package" fill loading="eager" sizes="(max-width: 1024px) 100vw, 50vw" className="motion-image object-cover" />
             </div>
             <div className="flex flex-col justify-center p-8 sm:p-12">
               <Sparkles className="size-7 text-brand-lavender" />
@@ -96,6 +96,7 @@ function GiftPackagesBanner() {
             alt="Premium NexaNotion gift packages arranged for special moments"
             fill
             priority
+            loading="eager"
             sizes="(max-width: 768px) 100vw, 1400px"
             className="object-cover object-[64%_center] sm:object-center"
           />

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/config/site";
+import { defaultCatalogImage, getSafeImageUrlOrDefault } from "@/lib/image-fallbacks";
 
 const defaultKeywords = [
   "NexaNotion",
@@ -11,7 +12,7 @@ const defaultKeywords = [
   "Panjabi Bangladesh",
 ];
 
-const defaultImage = "/images/nexanotion-hero.png";
+const defaultImage = defaultCatalogImage;
 
 function getConfiguredSiteUrl() {
   return siteConfig.siteUrl || "";
@@ -46,7 +47,8 @@ export function createSeoMetadata({
   noIndex?: boolean;
 }): Metadata {
   const canonical = absoluteUrl(path);
-  const imageUrl = absoluteUrl(image) ?? image;
+  const safeImage = getSafeImageUrlOrDefault(image);
+  const imageUrl = absoluteUrl(safeImage) ?? safeImage;
   const fullTitle = title === siteConfig.name ? `${siteConfig.name} | Fashion, Beauty & Gifts in Bangladesh` : `${title} | ${siteConfig.name}`;
 
   return {

@@ -1,8 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Sparkles } from "lucide-react";
+import { getSafeImageUrl } from "@/lib/image-fallbacks";
 import type { Category } from "@/types";
 
 export function CompactCategoryCard({ category, priority = false }: { category: Category; priority?: boolean }) {
+  const image = getSafeImageUrl(category.image);
+
   return (
     <Link
       href={category.href}
@@ -12,14 +16,20 @@ export function CompactCategoryCard({ category, priority = false }: { category: 
       <span className="relative grid size-[60px] place-items-center rounded-full border border-brand-navy/8 bg-white shadow-[0_8px_22px_rgba(5,10,31,0.06)] transition duration-300 group-hover:border-brand-purple/35 group-hover:shadow-[0_14px_30px_rgba(91,33,232,0.14)] sm:size-20">
         <span className="absolute inset-1 rounded-full bg-gradient-to-br from-brand-soft via-white to-brand-lavender/70" />
         <span className="relative size-[52px] overflow-hidden rounded-full bg-brand-soft sm:size-[68px]">
-          <Image
-            src={category.image}
-            alt={category.name}
-            fill
-            priority={priority}
-            sizes="(max-width: 640px) 52px, 68px"
-            className="motion-image object-cover object-center group-hover:scale-[1.03]"
-          />
+          {image ? (
+            <Image
+              src={image}
+              alt={category.name}
+              fill
+              priority={priority}
+              sizes="(max-width: 640px) 52px, 68px"
+              className="motion-image object-cover object-center group-hover:scale-[1.03]"
+            />
+          ) : (
+            <span className="grid size-full place-items-center bg-gradient-to-br from-white via-brand-soft to-brand-lavender text-brand-purple">
+              <Sparkles className="size-5 sm:size-6" aria-hidden="true" />
+            </span>
+          )}
         </span>
       </span>
       <span className="text-xs font-semibold leading-4 text-brand-navy transition group-hover:text-brand-purple sm:text-sm sm:leading-5">{category.name}</span>

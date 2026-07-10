@@ -1,14 +1,20 @@
 import { createClient } from "@supabase/supabase-js";
 import { categories as fallbackCategories, allProducts as fallbackProducts } from "@/data/store";
+import { getSafeImageUrl, getSafeImageUrlOrDefault } from "@/lib/image-fallbacks";
 import { isSupabasePublicConfigured, getPublicSupabaseEnv } from "@/lib/supabase/env";
 import type { Database, SupabaseProductRow } from "@/lib/supabase/database";
 import type { Category, Product } from "@/types";
 
 type ProductWithCategory = SupabaseProductRow & { categories: { name: string; slug: string; is_active: boolean | null } | null };
 
+function filterCategoriesWithProducts(categories: Category[], products: Product[]) {
+  const productCategorySlugs = new Set(products.map((product) => product.categorySlug));
+  return categories.filter((category) => productCategorySlugs.has(category.slug));
+}
+
 export async function getCatalogWithFallback(): Promise<{ categories: Category[]; products: Product[]; source: "supabase" | "fallback" }> {
   if (!isSupabasePublicConfigured()) {
-    return { categories: fallbackCategories, products: fallbackProducts, source: "fallback" };
+    return { categories: filterCategoriesWithProducts(fallbackCategories, fallbackProducts), products: fallbackProducts, source: "fallback" };
   }
 
   try {
@@ -27,14 +33,14 @@ export async function getCatalogWithFallback(): Promise<{ categories: Category[]
       slug: category.slug as Category["slug"],
       name: category.name,
       description: category.description ?? "",
-      image: category.image_url ?? "/images/nexanotion-hero.png",
+      image: getSafeImageUrl(category.image_url),
       href: `/shop?category=${category.slug}`,
     }));
 
     const activeCategorySlugs = new Set(categories.map((category) => category.slug));
     const products = (productsResult.data as unknown as ProductWithCategory[]).filter((product) => product.categories?.slug && activeCategorySlugs.has(product.categories.slug)).map((product) => {
       const categorySlug = (product.categories?.slug ?? "gift-packages") as Product["categorySlug"];
-      const image = product.image_url ?? "/images/nexanotion-hero.png";
+      const image = getSafeImageUrlOrDefault(product.image_url);
       return {
         id: product.id,
         slug: product.slug,
@@ -44,7 +50,7 @@ export async function getCatalogWithFallback(): Promise<{ categories: Category[]
         price: product.compare_at_price ?? product.price,
         salePrice: product.compare_at_price ? product.price : undefined,
         image,
-        images: product.gallery_urls?.length ? product.gallery_urls : [image],
+        images: product.gallery_urls?.map((url) => getSafeImageUrl(url)).filter(Boolean).length ? product.gallery_urls.map((url) => getSafeImageUrl(url)).filter(Boolean) : [image],
         shortDescription: product.short_description ?? "",
         description: product.description ?? "",
         tags: product.tags ?? [],
@@ -57,9 +63,9 @@ export async function getCatalogWithFallback(): Promise<{ categories: Category[]
       };
     });
 
-    return { categories, products, source: "supabase" };
+    return { categories: filterCategoriesWithProducts(categories, products), products, source: "supabase" };
   } catch {
     // Keep safe category navigation available without showing production-facing fake products.
-    return { categories: fallbackCategories, products: fallbackProducts, source: "fallback" };
+    return { categories: filterCategoriesWithProducts(fallbackCategories, fallbackProducts), products: fallbackProducts, source: "fallback" };
   }
 }
