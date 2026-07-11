@@ -19,6 +19,7 @@ export const metadata: Metadata = createSeoMetadata({
   path: "/",
   keywords: ["fashion gifts Bangladesh", "manual bKash shopping", "Nagad shopping Bangladesh"],
 });
+export const dynamic = "force-dynamic";
 
 const trustItems = [
   { icon: Sparkles, title: "Trendy Collection", description: "Handpicked pieces that match the latest trends." },

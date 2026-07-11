@@ -26,6 +26,14 @@ export async function getCatalogWithFallback(): Promise<{ categories: Category[]
     ]);
 
     if (categoriesResult.error || productsResult.error) {
+      console.error("[catalog] Supabase catalog query failed.", {
+        categories: categoriesResult.error
+          ? { code: categoriesResult.error.code, message: categoriesResult.error.message }
+          : null,
+        products: productsResult.error
+          ? { code: productsResult.error.code, message: productsResult.error.message }
+          : null,
+      });
       return { categories: fallbackCategories, products: fallbackProducts, source: "fallback" };
     }
 
@@ -64,7 +72,8 @@ export async function getCatalogWithFallback(): Promise<{ categories: Category[]
     });
 
     return { categories: filterCategoriesWithProducts(categories, products), products, source: "supabase" };
-  } catch {
+  } catch (error) {
+    console.error("[catalog] Unexpected catalog load failure.", error instanceof Error ? error.message : "Unknown error");
     // Keep safe category navigation available without showing production-facing fake products.
     return { categories: filterCategoriesWithProducts(fallbackCategories, fallbackProducts), products: fallbackProducts, source: "fallback" };
   }
