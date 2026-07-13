@@ -8,6 +8,19 @@ import { Container } from "@/components/ui/container";
 import { siteConfig } from "@/config/site";
 import { createSeoMetadata } from "@/lib/seo";
 import { getCatalogWithFallback } from "@/lib/supabase/catalog";
+import type { Product } from "@/types";
+
+type DiscountedProduct = Product & { salePrice: number };
+
+function isDiscountedProduct(product: Product): product is DiscountedProduct {
+  return (
+    typeof product.salePrice === "number" &&
+    Number.isFinite(product.price) &&
+    Number.isFinite(product.salePrice) &&
+    product.salePrice > 0 &&
+    product.salePrice < product.price
+  );
+}
 
 export const metadata: Metadata = createSeoMetadata({
   title: "Offers",
@@ -20,7 +33,10 @@ export const dynamic = "force-dynamic";
 
 export default async function OffersPage() {
   const catalog = await getCatalogWithFallback();
-  const offerProducts = catalog.products.filter((product) => product.isOffer);
+  const offerProducts = catalog.products.filter(isDiscountedProduct).map((product) => ({
+    ...product,
+    badge: `${Math.round(((product.price - product.salePrice) / product.price) * 100)}% OFF`,
+  }));
 
   return (
     <main className="bg-[linear-gradient(180deg,#f8faff_0%,#ffffff_42%,#ffffff_100%)]">
